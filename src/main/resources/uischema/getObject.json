@@ -1,0 +1,63 @@
+{
+  "connectorName": "minio",
+  "operationName": "getObject",
+  "title": "Get An Object",
+  "help": "",
+  "elements": [
+    {
+      "type": "attribute",
+      "value": {
+        "name": "address",
+        "displayName": "Address",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "The URL of the object storage server",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "bucket",
+        "displayName": "Bucket",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "The name of the bucket. This doesn't include the sub-directory directory.",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "filename",
+        "displayName": "Filename",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "The name of the object",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "accessKey",
+        "displayName": "Access Key",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "Access key",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "secretKey",
+        "displayName": "Secret Key",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "Secrete key",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    }
+  ]
+}
