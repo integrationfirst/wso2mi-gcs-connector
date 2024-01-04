@@ -20,7 +20,7 @@
     <component name="minio" package="org.wso2.carbon.connector">
         <dependency component="config"/>
         <dependency component="object"/>
-        <description>WSO2 MI Minio connector library</description>
+        <description>Google Cloud Storage Connector</description>
     </component>
     <icon>icon/icon-small.gif</icon>
 </connector>
