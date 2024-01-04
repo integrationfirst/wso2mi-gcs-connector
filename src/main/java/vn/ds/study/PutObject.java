@@ -17,9 +17,12 @@
  */
 package vn.ds.study;
 
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import io.minio.MinioClient;
 import io.minio.ObjectWriteResponse;
-import io.minio.PutObjectArgs;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
@@ -34,9 +37,32 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
-
 @Slf4j
 public class PutObject extends MinioAgent {
+
+    private static void uploadObjectFromMemory(
+            String projectId, String bucketName, String objectName, InputStream inputStream) throws IOException {
+        // The ID of your GCP project
+        // String projectId = "your-project-id";
+
+        // The ID of your GCS bucket
+        // String bucketName = "your-unique-bucket-name";
+
+        // The ID of your GCS object
+        // String objectName = "your-object-name";
+
+        // The string of contents you wish to upload
+        // String contents = "Hello world!";
+
+        Storage storage = StorageOptions.newBuilder()
+                                        .setProjectId(projectId)
+                                        .build()
+                                        .getService();
+        BlobId blobId = BlobId.of(bucketName, objectName);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                                    .build();
+        storage.createFrom(blobInfo, inputStream);
+    }
 
     @Override
     public void execute(MessageContext messageContext) throws ConnectException {
@@ -74,7 +100,7 @@ public class PutObject extends MinioAgent {
                             .map(ObjectWriteResponse::object)
                             .map(o -> "Processed object " + o)
                             .ifPresent(log::info);
-                    
+
                     messageContext.setProperty("putObjectResult", "SUCCESS");
                     log.info("Put object {} to OS successfully", objectKey);
                     return res;
@@ -92,21 +118,4 @@ public class PutObject extends MinioAgent {
         return null;
     }
 
-    private ObjectWriteResponse putObject(final InputStream is, final MinioClient client, final String bucket,
-                                          final String objectKey) {
-
-        try (is) {
-            log.info("Putting object {}", objectKey);
-            return client.putObject(
-                    PutObjectArgs.builder()
-                                 .bucket(bucket)
-                                 .object(objectKey)
-                                 .stream(is, -1, 10485760)
-                                 .build());
-        } catch (Exception e) {
-            log.error("Failed to execute putObject", e);
-        }
-
-        return null;
-    }
 }

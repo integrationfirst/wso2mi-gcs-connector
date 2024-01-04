@@ -30,7 +30,6 @@
     <properties>
         <connector.name>minio</connector.name>
         <connector.version>${version}</connector.version>
-        <minio.version>8.3.4</minio.version>
         <integration.base.version>1.0.2</integration.base.version>
         <product.ei.version>6.1.1</product.ei.version>
         <carbon.kernel.version>4.4.17</carbon.kernel.version>
@@ -49,13 +48,21 @@
         <lombok.version>1.16.22</lombok.version>
         <java.version>11</java.version>
     </properties>
-
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>libraries-bom</artifactId>
+                <version>26.27.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
-            <groupId>io.minio</groupId>
-            <artifactId>minio</artifactId>
-            <version>${minio.version}</version>
-            <scope>compile</scope>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -319,9 +326,8 @@
                                     <outputDirectory>target/connector/dependencies</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>io.minio</groupId>
-                                    <artifactId>minio</artifactId>
-                                    <version>${minio.version}</version>
+                                    <groupId>com.google.cloud</groupId>
+                                    <artifactId>google-cloud-storage</artifactId>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>target/connector/dependencies</outputDirectory>
