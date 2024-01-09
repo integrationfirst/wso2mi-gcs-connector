@@ -7,17 +7,6 @@
     {
       "type": "attribute",
       "value": {
-        "name": "address",
-        "displayName": "Address",
-        "inputType": "stringOrExpression",
-        "required": "true",
-        "helpTip": "The URL of the object storage server",
-        "validation": "nameWithoutSpecialCharactors"
-      }
-    },
-    {
-      "type": "attribute",
-      "value": {
         "name": "bucket",
         "displayName": "Bucket",
         "inputType": "stringOrExpression",
@@ -33,29 +22,7 @@
         "displayName": "Object Key",
         "inputType": "stringOrExpression",
         "required": "true",
-        "helpTip": "The absolute path to the object",
-        "validation": "nameWithoutSpecialCharactors"
-      }
-    },
-    {
-      "type": "attribute",
-      "value": {
-        "name": "accessKey",
-        "displayName": "Access Key",
-        "inputType": "stringOrExpression",
-        "required": "true",
-        "helpTip": "Access key",
-        "validation": "nameWithoutSpecialCharactors"
-      }
-    },
-    {
-      "type": "attribute",
-      "value": {
-        "name": "secretKey",
-        "displayName": "Access Secret",
-        "inputType": "stringOrExpression",
-        "required": "true",
-        "helpTip": "Secrete key",
+        "helpTip": "The absolute path to the object. This does not include bucket prefix.",
         "validation": "nameWithoutSpecialCharactors"
       }
     }

@@ -16,11 +16,8 @@
    under the License.
 -->
 <template xmlns="http://ws.apache.org/ns/synapse" name="putObject">
-    <parameter name="address"/>
     <parameter name="bucket"/>
     <parameter name="objectKey"/>
-    <parameter name="accessKey"/>
-    <parameter name="secretKey"/>
     <sequence>
         <class name="vn.ds.study.PutObject"/>
     </sequence>

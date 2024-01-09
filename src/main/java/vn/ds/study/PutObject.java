@@ -41,18 +41,6 @@ public class PutObject extends MinioAgent {
     private static String uploadObjectFromMemory(
             String projectId, String bucketName, String objectKey, InputStream inputStream) {
 
-        // The ID of your GCP project
-        // String projectId = "your-project-id";
-
-        // The ID of your GCS bucket
-        // String bucketName = "your-unique-bucket-name";
-
-        // The ID of your GCS object
-        // String objectName = "your-object-name";
-
-        // The string of contents you wish to upload
-        // String contents = "Hello world!";
-
         try {
             Storage storage = StorageOptions.newBuilder()
                                             .setProjectId(projectId)
@@ -77,8 +65,6 @@ public class PutObject extends MinioAgent {
         String projectId = getParameterAsString("projectId");
         String bucket = getParameterAsString("bucket");
         String objectKey = getParameterAsString("objectKey");
-        String accessKey = getParameterAsString("accessKey");
-        String secretKey = getParameterAsString("secretKey");
 
         final String googleApplicationCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
         if (googleApplicationCredentials == null || googleApplicationCredentials.isEmpty()) {
