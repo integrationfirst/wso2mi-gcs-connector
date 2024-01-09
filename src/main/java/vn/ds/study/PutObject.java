@@ -21,8 +21,6 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import io.minio.MinioClient;
-import io.minio.ObjectWriteResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
@@ -40,8 +38,9 @@ import java.util.Optional;
 @Slf4j
 public class PutObject extends MinioAgent {
 
-    private static void uploadObjectFromMemory(
-            String projectId, String bucketName, String objectName, InputStream inputStream) throws IOException {
+    private static String uploadObjectFromMemory(
+            String projectId, String bucketName, String objectKey, InputStream inputStream) {
+
         // The ID of your GCP project
         // String projectId = "your-project-id";
 
@@ -54,14 +53,20 @@ public class PutObject extends MinioAgent {
         // The string of contents you wish to upload
         // String contents = "Hello world!";
 
-        Storage storage = StorageOptions.newBuilder()
-                                        .setProjectId(projectId)
-                                        .build()
-                                        .getService();
-        BlobId blobId = BlobId.of(bucketName, objectName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                                    .build();
-        storage.createFrom(blobInfo, inputStream);
+        try {
+            Storage storage = StorageOptions.newBuilder()
+                                            .setProjectId(projectId)
+                                            .build()
+                                            .getService();
+            BlobId blobId = BlobId.of(bucketName, objectKey);
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                                        .build();
+            storage.createFrom(blobInfo, inputStream);
+            return blobId.toString();
+        } catch (IOException e) {
+            log.error("Failed to upload object {} to GCS", objectKey, e);
+        }
+        return null;
     }
 
     @Override
@@ -69,42 +74,35 @@ public class PutObject extends MinioAgent {
 
         Axis2MessageContext context = (Axis2MessageContext) messageContext;
 
-        String address = getParameterAsString("address");
+        String projectId = getParameterAsString("projectId");
         String bucket = getParameterAsString("bucket");
         String objectKey = getParameterAsString("objectKey");
         String accessKey = getParameterAsString("accessKey");
         String secretKey = getParameterAsString("secretKey");
 
-        log.info("Put object {} to OS address {}", objectKey, address);
-        MinioClient client = getClient(address, accessKey, secretKey);
-
-        if (client == null) {
-            log.info("Failed to login into OS with access: {} and secret: {}", accessKey, secretKey);
+        final String googleApplicationCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+        if (googleApplicationCredentials == null || googleApplicationCredentials.isEmpty()) {
+            log.error("Missing GOOGLE_APPLICATION_CREDENTIALS environment variable! GCS client use this to locate the credential file");
+            context.setProperty("putObjectResult", false);
             return;
         }
 
-        log.info("Successfully login into OS");
+        log.info("Put object {} to GCS address", objectKey);
 
-        Optional.of(context)
-                .map(Axis2MessageContext::getEnvelope)
-                .map(SOAPEnvelope::getBody)
-                .map(OMElement::getFirstElement)
-                .map(OMContainer::getFirstOMChild)
-                .map(OMText.class::cast)
-                .map(OMText::getDataHandler)
-                .map(DataHandler.class::cast)
-                .map(this::inputStream)
-                .map(is -> putObject(is, client, bucket, objectKey))
-                .map(res -> {
-                    Optional.ofNullable(res)
-                            .map(ObjectWriteResponse::object)
-                            .map(o -> "Processed object " + o)
-                            .ifPresent(log::info);
+        final Boolean uploadResult = Optional.of(context)
+                                             .map(Axis2MessageContext::getEnvelope)
+                                             .map(SOAPEnvelope::getBody)
+                                             .map(OMElement::getFirstElement)
+                                             .map(OMContainer::getFirstOMChild)
+                                             .map(OMText.class::cast)
+                                             .map(OMText::getDataHandler)
+                                             .map(DataHandler.class::cast)
+                                             .map(this::inputStream)
+                                             .map(is -> uploadObjectFromMemory(projectId, bucket, objectKey, is))
+                                             .map(res -> res != null && !res.isEmpty())
+                                             .orElse(false);
+        context.setProperty("putObjectResult", uploadResult.booleanValue());
 
-                    messageContext.setProperty("putObjectResult", "SUCCESS");
-                    log.info("Put object {} to OS successfully", objectKey);
-                    return res;
-                });
         log.info("Complete process to put object {} to OS", objectKey);
     }
 
