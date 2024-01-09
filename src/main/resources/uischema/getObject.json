@@ -1,5 +1,5 @@
 {
-  "connectorName": "minio",
+  "connectorName": "gcs",
   "operationName": "getObject",
   "title": "Get An Object",
   "help": "",
@@ -7,11 +7,11 @@
     {
       "type": "attribute",
       "value": {
-        "name": "address",
-        "displayName": "Address",
+        "name": "projectId",
+        "displayName": "Project Id",
         "inputType": "stringOrExpression",
         "required": "true",
-        "helpTip": "The URL of the object storage server",
+        "helpTip": "The id of Google Cloud project.",
         "validation": "nameWithoutSpecialCharactors"
       }
     },
@@ -29,33 +29,11 @@
     {
       "type": "attribute",
       "value": {
-        "name": "filename",
-        "displayName": "Filename",
+        "name": "objectKey",
+        "displayName": "Object Key",
         "inputType": "stringOrExpression",
         "required": "true",
-        "helpTip": "The name of the object",
-        "validation": "nameWithoutSpecialCharactors"
-      }
-    },
-    {
-      "type": "attribute",
-      "value": {
-        "name": "accessKey",
-        "displayName": "Access Key",
-        "inputType": "stringOrExpression",
-        "required": "true",
-        "helpTip": "Access key",
-        "validation": "nameWithoutSpecialCharactors"
-      }
-    },
-    {
-      "type": "attribute",
-      "value": {
-        "name": "secretKey",
-        "displayName": "Secret Key",
-        "inputType": "stringOrExpression",
-        "required": "true",
-        "helpTip": "Secrete key",
+        "helpTip": "The absolute path to the object. This does not include the bucket prefix.",
         "validation": "nameWithoutSpecialCharactors"
       }
     }
