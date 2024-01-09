@@ -1,7 +1,5 @@
 ## putObject
 
----
-
 The method writes an object to Object Storage with specific metadata. The method requires an input envelop contains
 _only one node_ with binary data in it.
 
@@ -33,7 +31,6 @@ __Output Parameters__
 
 ## getObject
 
----
 Read the byte array of the object from Object Storage by its `bucket` and `key`
 
 __Input Parameters__
