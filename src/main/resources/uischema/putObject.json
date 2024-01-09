@@ -1,9 +1,20 @@
 {
-  "connectorName": "minio",
+  "connectorName": "gcs",
   "operationName": "putObject",
   "title": "Put An Object",
   "help": "",
   "elements": [
+    {
+      "type": "attribute",
+      "value": {
+        "name": "projectId",
+        "displayName": "Project Id",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "The id of Google Cloud project.",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    },
     {
       "type": "attribute",
       "value": {

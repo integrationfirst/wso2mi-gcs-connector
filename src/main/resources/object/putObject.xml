@@ -16,6 +16,7 @@
    under the License.
 -->
 <template xmlns="http://ws.apache.org/ns/synapse" name="putObject">
+    <parameter name="projectId"/>
     <parameter name="bucket"/>
     <parameter name="objectKey"/>
     <sequence>
