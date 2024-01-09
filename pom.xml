@@ -28,7 +28,7 @@
     <url>https://wso2.org</url>
 
     <properties>
-        <connector.name>minio</connector.name>
+        <connector.name>gcs</connector.name>
         <connector.version>${project.version}</connector.version>
         <integration.base.version>1.0.2</integration.base.version>
         <product.ei.version>6.1.1</product.ei.version>
