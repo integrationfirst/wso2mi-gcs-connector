@@ -1,5 +1,5 @@
 {
-  "connectorName": "minio",
+  "connectorName": "gcs",
   "operationName": "putObject",
   "title": "Put An Object",
   "help": "",
@@ -7,11 +7,11 @@
     {
       "type": "attribute",
       "value": {
-        "name": "address",
-        "displayName": "Address",
+        "name": "projectId",
+        "displayName": "Project Id",
         "inputType": "stringOrExpression",
         "required": "true",
-        "helpTip": "The URL of the object storage server",
+        "helpTip": "The id of Google Cloud project.",
         "validation": "nameWithoutSpecialCharactors"
       }
     },
@@ -33,29 +33,7 @@
         "displayName": "Object Key",
         "inputType": "stringOrExpression",
         "required": "true",
-        "helpTip": "The absolute path to the object",
-        "validation": "nameWithoutSpecialCharactors"
-      }
-    },
-    {
-      "type": "attribute",
-      "value": {
-        "name": "accessKey",
-        "displayName": "Access Key",
-        "inputType": "stringOrExpression",
-        "required": "true",
-        "helpTip": "Access key",
-        "validation": "nameWithoutSpecialCharactors"
-      }
-    },
-    {
-      "type": "attribute",
-      "value": {
-        "name": "secretKey",
-        "displayName": "Access Secret",
-        "inputType": "stringOrExpression",
-        "required": "true",
-        "helpTip": "Secrete key",
+        "helpTip": "The absolute path to the object. This does not include bucket prefix.",
         "validation": "nameWithoutSpecialCharactors"
       }
     }
