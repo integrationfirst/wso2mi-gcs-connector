@@ -20,6 +20,6 @@
     <parameter name="bucket"/>
     <parameter name="objectKey"/>
     <sequence>
-        <class name="vn.ds.study.GetObject"/>
+        <class name="vn.ds.study.mi.connector.gcs.GetObject"/>
     </sequence>
 </template>

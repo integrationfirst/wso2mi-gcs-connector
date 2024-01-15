@@ -10,15 +10,15 @@
  * Swiss Post Solution.
  * Floor 4-5-8, ICT Tower, Quang Trung Software City
  */
-package vn.ds.study.utils;
-
-import javax.xml.stream.XMLStreamException;
+package vn.ds.study.mi.connector.gcs.utils;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.stream.XMLStreamException;
 
 public final class OMElementUtils {
 
@@ -28,7 +28,7 @@ public final class OMElementUtils {
 
     }
 
-    public static OMElement createOMElement(final String elementName,final Object value) {
+    public static OMElement createOMElement(final String elementName, final Object value) {
         OMElement resultElement = null;
         try {
             if (value != null) {

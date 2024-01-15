@@ -1,4 +1,4 @@
-package vn.ds.study;
+package vn.ds.study.mi.connector.gcs;
 
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;

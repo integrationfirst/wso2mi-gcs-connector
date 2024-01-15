@@ -10,7 +10,7 @@
  * Swiss Post Solution.
  * Floor 4-5-8, ICT Tower, Quang Trung Software City
  */
-package vn.ds.study;
+package vn.ds.study.mi.connector.gcs;
 
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
@@ -22,7 +22,7 @@ import org.apache.synapse.commons.json.JsonUtil;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.wso2.carbon.connector.core.ConnectException;
-import vn.ds.study.utils.OMElementUtils;
+import vn.ds.study.mi.connector.gcs.utils.OMElementUtils;
 
 import java.util.Base64;
 
@@ -79,8 +79,8 @@ public class GetObject extends MinioAgent {
 
             log.info("Complete getting object {} from GCS", objectKey);
         } catch (Exception e) {
-            log.error("", e);
-            throw new ConnectException(e, "Failed to download file. Detail: ");
+            log.error("Failed to dowload object {} from GCS", objectKey, e);
+            throw e;
         }
     }
 }
