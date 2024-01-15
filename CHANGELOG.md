@@ -1,3 +1,10 @@
+## v1.0.2
+
+#### Added
+
++ Fix method: `putObject`
++
+
 ## v1.0.1
 
 #### Added
