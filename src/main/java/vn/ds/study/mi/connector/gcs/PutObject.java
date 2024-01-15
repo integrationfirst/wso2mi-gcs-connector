@@ -15,22 +15,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package vn.ds.study;
+package vn.ds.study.mi.connector.gcs;
 
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.axiom.om.OMContainer;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMText;
-import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.wso2.carbon.connector.core.ConnectException;
 
 import javax.activation.DataHandler;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
@@ -60,36 +57,48 @@ public class PutObject extends MinioAgent {
     @Override
     public void execute(MessageContext messageContext) throws ConnectException {
 
+        messageContext.getContextEntries()
+                      .keySet()
+                      .stream()
+                      .map(k -> String.format("KEY: %s", k))
+                      .forEach(log::info);
         Axis2MessageContext context = (Axis2MessageContext) messageContext;
 
         String projectId = getParameterAsString("projectId");
         String bucket = getParameterAsString("bucket");
         String objectKey = getParameterAsString("objectKey");
+        Object rawContent = getParameter(context, "content");
 
-        final String googleApplicationCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
-        if (googleApplicationCredentials == null || googleApplicationCredentials.isEmpty()) {
-            log.error("Missing GOOGLE_APPLICATION_CREDENTIALS environment variable! GCS client use this to locate the credential file");
-            context.setProperty("putObjectResult", false);
-            return;
+        try {
+            final String googleApplicationCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+            if (googleApplicationCredentials == null || googleApplicationCredentials.isEmpty()) {
+                log.error("Missing GOOGLE_APPLICATION_CREDENTIALS environment variable! GCS client use this to locate the credential file");
+                context.setProperty("putObjectResult", false);
+                return;
+            }
+
+            InputStream is = null;
+            if (rawContent instanceof String) {
+                log.debug("Content: {}", rawContent);
+                is = inputStream((String) rawContent);
+            } else {
+                log.debug("Content seems like a binary {}", rawContent.getClass()
+                                                                      .getName());
+                return;
+            }
+
+            log.info("Put object {} to GCS address", objectKey);
+            final Boolean uploadResult = Optional.of(is)
+                                                 .map(i -> uploadObjectFromMemory(projectId, bucket, objectKey, i))
+                                                 .map(res -> res != null && !res.isEmpty())
+                                                 .orElse(false);
+            context.setProperty("putObjectResult", uploadResult.booleanValue());
+
+            log.info("Complete process to put object {} to OS", objectKey);
+        } catch (Exception e) {
+            log.error("Failed to upload object {} to GCS", objectKey, e);
+            throw e;
         }
-
-        log.info("Put object {} to GCS address", objectKey);
-
-        final Boolean uploadResult = Optional.of(context)
-                                             .map(Axis2MessageContext::getEnvelope)
-                                             .map(SOAPEnvelope::getBody)
-                                             .map(OMElement::getFirstElement)
-                                             .map(OMContainer::getFirstOMChild)
-                                             .map(OMText.class::cast)
-                                             .map(OMText::getDataHandler)
-                                             .map(DataHandler.class::cast)
-                                             .map(this::inputStream)
-                                             .map(is -> uploadObjectFromMemory(projectId, bucket, objectKey, is))
-                                             .map(res -> res != null && !res.isEmpty())
-                                             .orElse(false);
-        context.setProperty("putObjectResult", uploadResult.booleanValue());
-
-        log.info("Complete process to put object {} to OS", objectKey);
     }
 
     private InputStream inputStream(DataHandler dataHandler) {
@@ -100,6 +109,11 @@ public class PutObject extends MinioAgent {
         }
 
         return null;
+    }
+
+    private InputStream inputStream(String text) {
+        log.debug("Convert text [{}] into input stream", text);
+        return new ByteArrayInputStream(text.getBytes());
     }
 
 }

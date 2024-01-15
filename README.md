@@ -1,19 +1,6 @@
 ## putObject
 
-The method writes an object to Object Storage with specific metadata. The method requires an input envelop contains
-_only one node_ with binary data in it.
-
-For example:
-
-```xml
-
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-    <soapenv:Body>
-        <axis2ns1:binary xmlns:axis2ns1="http://ws.apache.org/commons/ns/payload">JVBERi0xLjQKJYCAgIANM...
-        </axis2ns1:binary>
-    </soapenv:Body>
-</soapenv:Envelope>
-```
+The method writes an object to Object Storage with specific metadata.
 
 __Input Parameters__
 
@@ -22,6 +9,7 @@ __Input Parameters__
 | `pojectId`  | The ID of the Google Cloud project                                                      
 | `bucket`    | The bucket in which the object will be put. E.g.: `projectA`                            
 | `objectKey` | Absolute path to the object, it's without the bucket. E.g.: `/input/2023/12/myfile.jpg` 
+| `content`   | The object data. It could be text-based or binary object.                               
 
 __Output Parameters__
 

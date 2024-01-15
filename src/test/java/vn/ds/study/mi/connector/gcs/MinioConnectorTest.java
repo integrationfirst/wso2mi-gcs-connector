@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package vn.ds.study;
+package vn.ds.study.mi.connector.gcs;
 
 import org.json.JSONObject;
 import org.testng.annotations.BeforeClass;
@@ -31,8 +31,8 @@ import java.util.Map;
  */
 public class MinioConnectorTest extends ConnectorIntegrationTestBase {
 
-    private Map<String, String> eiRequestHeadersMap = new HashMap<>();
-    private Map<String, String> apiRequestHeadersMap = new HashMap<>();
+    private final Map<String, String> eiRequestHeadersMap = new HashMap<>();
+    private final Map<String, String> apiRequestHeadersMap = new HashMap<>();
 
     @BeforeClass(alwaysRun = true)
     public void setEnvironment() throws Exception {

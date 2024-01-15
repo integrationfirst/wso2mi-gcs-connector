@@ -36,6 +36,16 @@
         "helpTip": "The absolute path to the object. This does not include bucket prefix.",
         "validation": "nameWithoutSpecialCharactors"
       }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "content",
+        "displayName": "Content",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "The content of the object."
+      }
     }
   ]
 }
