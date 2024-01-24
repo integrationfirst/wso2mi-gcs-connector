@@ -36,6 +36,28 @@
         "helpTip": "The absolute path to the object. This does not include the bucket prefix.",
         "validation": "nameWithoutSpecialCharactors"
       }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "contentType",
+        "displayName": "Content Type",
+        "inputType": "stringOrExpression",
+        "required": "false",
+        "helpTip": "The content type of the object.",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "contentPropertyName",
+        "displayName": "Content Property Name",
+        "inputType": "stringOrExpression",
+        "required": "false",
+        "helpTip": "Name of the property used to store the object content. If not specified, the content will be stored in the body.",
+        "validation": "nameWithoutSpecialCharactors"
+      }
     }
   ]
 }
