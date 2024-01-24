@@ -20,6 +20,7 @@
     <parameter name="bucket"/>
     <parameter name="objectKey"/>
     <parameter name="content"/>
+    <parameter name="contentType"/>
     <sequence>
         <class name="vn.ds.study.mi.connector.gcs.PutObject"/>
     </sequence>

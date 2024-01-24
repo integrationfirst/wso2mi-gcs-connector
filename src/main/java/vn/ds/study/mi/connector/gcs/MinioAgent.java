@@ -4,6 +4,8 @@ import org.apache.synapse.MessageContext;
 import org.wso2.carbon.connector.core.AbstractConnector;
 import org.wso2.carbon.connector.core.ConnectException;
 
+import java.util.Optional;
+
 public abstract class MinioAgent extends AbstractConnector {
 
     private MessageContext context;
@@ -21,6 +23,12 @@ public abstract class MinioAgent extends AbstractConnector {
 
     protected String getParameterAsString(String parameterName) {
         return getParameter(parameterName, String.class);
+    }
+
+    protected String getParameterAsString(String parameterName, String defaultValue) {
+        return Optional.ofNullable(getParameterAsString(parameterName))
+                       .orElse(defaultValue);
+
     }
 
     protected abstract void execute(final MessageContext messageContext) throws ConnectException;

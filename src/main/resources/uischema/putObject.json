@@ -46,6 +46,16 @@
         "required": "true",
         "helpTip": "The content of the object."
       }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "contentType",
+        "displayName": "Content Type",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "The type of the object."
+      }
     }
   ]
 }
