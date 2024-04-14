@@ -32,7 +32,7 @@ import java.util.List;
 @Slf4j
 public class ListObjectByPrefix extends MinioAgent {
 
-    public static final String OBJECT_KEYS = "objs";
+    public static final String OBJECTS_KEY = "objs";
     private static final String OBJECT_KEY = "obj";
 
     @Override
@@ -53,17 +53,19 @@ public class ListObjectByPrefix extends MinioAgent {
             log.info("Get object {} from GCS", objectKeyPrefix);
 
             List<ObjectInfo> objs = listObjectByKeyPrefix(projectId, bucket, objectKeyPrefix);
-            OMElement filesEle = OMElementUtils.createOMElement(OBJECT_KEYS, null);
-            objs.forEach(k->{
-                OMElement objKey = OMElementUtils.createOMElement(OBJECT_KEY, null);
-                OMElement keyElement = OMElementUtils.createOMElement("key", k.getKey());
-                objKey.addChild(keyElement);
-                filesEle.addChild(objKey);
+            OMElement objsElement = OMElementUtils.createOMElement(OBJECTS_KEY, null);
+            objs.forEach(obj->{
+                OMElement objElement = OMElementUtils.createOMElement(OBJECT_KEY, null);
+                OMElement keyElement = OMElementUtils.createOMElement("key", obj.getKey());
+                OMElement md5Element = OMElementUtils.createOMElement("md5", obj.getMd5());
+                objElement.addChild(keyElement);
+                objElement.addChild(md5Element);
+                objsElement.addChild(objElement);
             });
             final ListObjectResult result = ListObjectResult.builder()
                                                             .operation("listObjectByPrefix")
                                                             .isSuccessful(true)
-                                                            .resultEle(filesEle)
+                                                            .resultEle(objsElement)
                                                             .build();
             OMElementUtils.setResultAsPayload(messageContext, result);
             log.info("Complete getting object {} from GCS", objectKeyPrefix);
@@ -82,10 +84,13 @@ public class ListObjectByPrefix extends MinioAgent {
         final List<ObjectInfo> res = new ArrayList<>();
 
         Page<Blob> blobs = storage.list(bucket, Storage.BlobListOption.prefix(objectKeyPrefix));
+        log.info("BLOBS: {}", blobs.toString());
         for (Blob blob : blobs.iterateAll()) {
-            blobs.getValues().forEach(obj->{
-                res.add(ObjectInfo.builder().key(obj.getName()).build());
-            });
+            res.add(ObjectInfo.builder()
+                              .key(blob.getName())
+                              .md5(blob.getMd5())
+                              .build());
+            log.info("Object with key {}", blob.getName());
         }
 
         return res;

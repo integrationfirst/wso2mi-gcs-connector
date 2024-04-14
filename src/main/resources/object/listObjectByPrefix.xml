@@ -15,7 +15,7 @@
    specific language governing permissions and limitations
    under the License.
 -->
-<template xmlns="http://ws.apache.org/ns/synapse" name="getObject">
+<template xmlns="http://ws.apache.org/ns/synapse" name="listObjectByPrefix">
     <parameter name="projectId"/>
     <parameter name="bucket"/>
     <parameter name="objectKeyPrefix"/>

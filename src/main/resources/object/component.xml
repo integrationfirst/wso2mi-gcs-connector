@@ -28,9 +28,9 @@
             <description>Method to get a particular object from GCS</description>
         </component>
 
-        <component name="getObject">
+        <component name="listObjectByPrefix">
             <file>listObjectByPrefix.xml</file>
-            <description>Method to get a particular object from GCS</description>
+            <description>Method to list object keys by prefix from GCS</description>
         </component>
     </subComponents>
 </component>
