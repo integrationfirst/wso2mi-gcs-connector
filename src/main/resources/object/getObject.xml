@@ -22,6 +22,6 @@
     <parameter name="contentType"/>
     <parameter name="contentPropertyName"/>
     <sequence>
-        <class name="vn.ds.study.mi.connector.gcs.GetObject"/>
+        <class name="vn.ds.study.mi.connector.gcs.operation.GetObject"/>
     </sequence>
 </template>

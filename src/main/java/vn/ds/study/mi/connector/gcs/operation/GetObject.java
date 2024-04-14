@@ -10,7 +10,7 @@
  * Swiss Post Solution.
  * Floor 4-5-8, ICT Tower, Quang Trung Software City
  */
-package vn.ds.study.mi.connector.gcs;
+package vn.ds.study.mi.connector.gcs.operation;
 
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
@@ -24,6 +24,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.transport.passthru.util.BinaryRelayBuilder;
 import org.wso2.carbon.connector.core.ConnectException;
+import vn.ds.study.mi.connector.gcs.MinioAgent;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

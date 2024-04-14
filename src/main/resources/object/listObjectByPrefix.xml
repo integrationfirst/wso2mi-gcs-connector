@@ -20,6 +20,6 @@
     <parameter name="bucket"/>
     <parameter name="objectKeyPrefix"/>
     <sequence>
-        <class name="vn.ds.study.mi.connector.gcs.ListObjectByPrefix"/>
+        <class name="vn.ds.study.mi.connector.gcs.operation.ListObjectByPrefix"/>
     </sequence>
 </template>
