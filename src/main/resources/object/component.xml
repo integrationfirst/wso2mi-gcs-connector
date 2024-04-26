@@ -32,5 +32,10 @@
             <file>listObjectByPrefix.xml</file>
             <description>Method to list object keys by prefix from GCS</description>
         </component>
+
+        <component name="deleteObject">
+            <file>deleteObject.xml</file>
+            <description>Method to delete one object key from GCS</description>
+        </component>
     </subComponents>
 </component>

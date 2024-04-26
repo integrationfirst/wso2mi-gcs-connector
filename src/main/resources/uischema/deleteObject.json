@@ -1,0 +1,41 @@
+{
+  "connectorName": "gcs",
+  "operationName": "deleteObject",
+  "title": "Delete An Object",
+  "help": "",
+  "elements": [
+    {
+      "type": "attribute",
+      "value": {
+        "name": "projectId",
+        "displayName": "Project Id",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "The id of Google Cloud project.",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "bucket",
+        "displayName": "Bucket",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "The name of the bucket. This doesn't include the sub-directory directory.",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "objectKey",
+        "displayName": "Object Key",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "The absolute path to the object. This does not include bucket prefix.",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    }
+  ]
+}
