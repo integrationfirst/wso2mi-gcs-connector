@@ -21,6 +21,6 @@
     <parameter name="objectKey"/>
     <parameter name="content"/>
     <sequence>
-        <class name="vn.ds.study.mi.connector.gcs.PutObject"/>
+        <class name="vn.ds.study.mi.connector.gcs.operation.PutObject"/>
     </sequence>
 </template>

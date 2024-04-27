@@ -15,13 +15,11 @@
    specific language governing permissions and limitations
    under the License.
 -->
-<template xmlns="http://ws.apache.org/ns/synapse" name="getObject">
+<template xmlns="http://ws.apache.org/ns/synapse" name="listObjectByPrefix">
     <parameter name="projectId"/>
     <parameter name="bucket"/>
-    <parameter name="objectKey"/>
-    <parameter name="contentType"/>
-    <parameter name="contentPropertyName"/>
+    <parameter name="objectKeyPrefix"/>
     <sequence>
-        <class name="vn.ds.study.mi.connector.gcs.operation.GetObject"/>
+        <class name="vn.ds.study.mi.connector.gcs.operation.ListObjectByPrefix"/>
     </sequence>
 </template>
