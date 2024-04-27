@@ -1,0 +1,41 @@
+{
+  "connectorName": "gcs",
+  "operationName": "listObjectByPrefix",
+  "title": "List the object keys by key prefix",
+  "help": "",
+  "elements": [
+    {
+      "type": "attribute",
+      "value": {
+        "name": "projectId",
+        "displayName": "Project Id",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "The id of Google Cloud project.",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "bucket",
+        "displayName": "Bucket",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "The name of the bucket. This doesn't include the sub-directory directory.",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    },
+    {
+      "type": "attribute",
+      "value": {
+        "name": "objectKeyPrefix",
+        "displayName": "Key Prefix",
+        "inputType": "stringOrExpression",
+        "required": "true",
+        "helpTip": "The prefix of the object key. This does not include the bucket name. Example: /invoice/2024/03",
+        "validation": "nameWithoutSpecialCharactors"
+      }
+    }
+  ]
+}

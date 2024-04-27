@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package vn.ds.study.mi.connector.gcs;
+package vn.ds.study.mi.connector.gcs.operation;
 
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.wso2.carbon.connector.core.ConnectException;
+import vn.ds.study.mi.connector.gcs.MinioAgent;
 
 import javax.activation.DataHandler;
 import java.io.ByteArrayInputStream;
