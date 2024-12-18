@@ -19,6 +19,7 @@
     <parameter name="projectId"/>
     <parameter name="bucket"/>
     <parameter name="objectKey"/>
+    <parameter name="contentType"/>
     <parameter name="content"/>
     <sequence>
         <class name="vn.ds.study.mi.connector.gcs.operation.PutObject"/>

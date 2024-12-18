@@ -31,13 +31,19 @@ import javax.activation.DataHandler;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
 public class PutObject extends MinioAgent {
 
     private static String uploadObjectFromMemory(
-            String projectId, String bucketName, String objectKey, InputStream inputStream) {
+            String projectId,
+            String bucketName,
+            String objectKey,
+            String contentType,
+            InputStream inputStream) {
 
         try {
             Storage storage = StorageOptions.newBuilder()
@@ -46,6 +52,7 @@ public class PutObject extends MinioAgent {
                                             .getService();
             BlobId blobId = BlobId.of(bucketName, objectKey);
             BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                                        .setContentType(contentType)
                                         .build();
             storage.createFrom(blobInfo, inputStream);
             return blobId.toString();
@@ -68,6 +75,8 @@ public class PutObject extends MinioAgent {
         String projectId = getParameterAsString("projectId");
         String bucket = getParameterAsString("bucket");
         String objectKey = getParameterAsString("objectKey");
+        String contentType = Optional.of(getParameterAsString("contentType"))
+                                     .orElse("application/json");
         Object rawContent = getParameter(context, "content");
 
         try {
@@ -79,18 +88,19 @@ public class PutObject extends MinioAgent {
             }
 
             InputStream is = null;
-            if (rawContent instanceof String) {
-                log.debug("Content: {}", rawContent);
-                is = inputStream((String) rawContent);
-            } else {
-                log.debug("Content seems like a binary {}", rawContent.getClass()
-                                                                      .getName());
-                return;
+            log.info("Start putting object {} and content type: {}",objectKey, contentType);
+
+            if (contentType.startsWith("application/json") || contentType.contains("text")) {
+                log.info("Text-based content");
+                is = new ByteArrayInputStream(Base64.getDecoder().decode((String) rawContent));
+            } else if (contentType.startsWith("image")){
+                log.info("Binary content {}", rawContent.getClass());
+                is = new ByteArrayInputStream(Base64.getDecoder().decode((String) rawContent));
             }
 
             log.info("Put object {} to GCS address", objectKey);
             final Boolean uploadResult = Optional.of(is)
-                                                 .map(i -> uploadObjectFromMemory(projectId, bucket, objectKey, i))
+                                                 .map(i -> uploadObjectFromMemory(projectId, bucket, objectKey,contentType, i))
                                                  .map(res -> res != null && !res.isEmpty())
                                                  .orElse(false);
             context.setProperty("putObjectResult", uploadResult.booleanValue());
