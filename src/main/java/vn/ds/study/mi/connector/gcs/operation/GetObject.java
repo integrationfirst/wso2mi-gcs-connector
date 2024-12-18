@@ -12,6 +12,7 @@
  */
 package vn.ds.study.mi.connector.gcs.operation;
 
+import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import lombok.extern.slf4j.Slf4j;
@@ -27,19 +28,23 @@ import org.wso2.carbon.connector.core.ConnectException;
 import vn.ds.study.mi.connector.gcs.MinioAgent;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Optional;
 
 @Slf4j
 public class GetObject extends MinioAgent {
 
-    public static InputStream downloadObjectIntoMemory(
-            String projectId, String bucket, String objectKey) {
+    public static Blob downloadObjectIntoMemory(
+            String projectId,
+            String bucket,
+            String objectKey) {
 
         Storage storage = StorageOptions.newBuilder()
                                         .setProjectId(projectId)
                                         .build()
                                         .getService();
-        return new ByteArrayInputStream(storage.readAllBytes(bucket, objectKey));
+        return storage.get(bucket, objectKey, Storage.BlobGetOption.fields(Storage.BlobField.values()));
     }
 
     @Override
@@ -50,7 +55,7 @@ public class GetObject extends MinioAgent {
         final String projectId = getParameterAsString("projectId");
         final String bucket = getParameterAsString("bucket");
         final String objectKey = getParameterAsString("objectKey");
-        final String contentType = getParameterAsString("contentType");
+        String contentType = getParameterAsString("contentType");
         final String contentPropertyName = getParameterAsString("contentPropertyName");
 
         try {
@@ -60,9 +65,18 @@ public class GetObject extends MinioAgent {
                 return;
             }
             log.info("Get object {} from GCS", objectKey);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-            try (InputStream inputStream = downloadObjectIntoMemory(projectId, bucket, objectKey)) {
-                buildSynapseMessage(inputStream, contentPropertyName, context, contentType);
+            Blob blob = downloadObjectIntoMemory(projectId, bucket, objectKey);
+
+            contentType = Optional.ofNullable(contentType)
+                                  .orElse(blob.getContentType());
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                blob.downloadTo(outputStream);
+
+                try (InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray())) {
+                    buildSynapseMessage(inputStream, contentPropertyName, "contentType", context, contentType);
+                }
             }
 
             log.info("Complete getting object {} from GCS", objectKey);
@@ -77,7 +91,10 @@ public class GetObject extends MinioAgent {
      * Build synapse message using inputStream. This will read the stream
      * completely and build the complete message.
      */
-    private void buildSynapseMessage(InputStream inputStream, String contentPropertyName, MessageContext msgCtx,
+    private void buildSynapseMessage(InputStream inputStream,
+                                     String contentPropertyName,
+                                     String contentTypePropertyName,
+                                     MessageContext msgCtx,
                                      String contentType) throws Exception {
 
         try {
@@ -87,6 +104,7 @@ public class GetObject extends MinioAgent {
             OMElement documentElement = builder.processDocument(inputStream, contentType, axis2MsgCtx);
             //We need this to build the complete message before closing the stream
             documentElement.toString();
+            msgCtx.setProperty(contentTypePropertyName, contentType);
             if (org.apache.commons.lang.StringUtils.isNotEmpty(contentPropertyName)) {
                 msgCtx.setProperty(contentPropertyName, documentElement);
             } else {

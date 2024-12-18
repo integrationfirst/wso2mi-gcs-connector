@@ -32,7 +32,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -88,19 +87,26 @@ public class PutObject extends MinioAgent {
             }
 
             InputStream is = null;
-            log.info("Start putting object {} and content type: {}",objectKey, contentType);
+            log.info("Start putting object {} and content type: {}", objectKey, contentType);
 
-            if (contentType.startsWith("application/json") || contentType.contains("text")) {
+            if (contentType.contains("json")
+                    || contentType.contains("text")
+                    || contentType.contains("xml")
+                    || contentType.contains("html")
+                    || contentType.contains("javascript")
+                    || contentType.contains("jwt")) {
                 log.info("Text-based content");
-                is = new ByteArrayInputStream(Base64.getDecoder().decode((String) rawContent));
-            } else if (contentType.startsWith("image")){
+                is = new ByteArrayInputStream(String.valueOf(rawContent)
+                                                    .getBytes());
+            } else {
                 log.info("Binary content {}", rawContent.getClass());
-                is = new ByteArrayInputStream(Base64.getDecoder().decode((String) rawContent));
+                is = new ByteArrayInputStream(Base64.getDecoder()
+                                                    .decode((String) rawContent));
             }
 
             log.info("Put object {} to GCS address", objectKey);
             final Boolean uploadResult = Optional.of(is)
-                                                 .map(i -> uploadObjectFromMemory(projectId, bucket, objectKey,contentType, i))
+                                                 .map(i -> uploadObjectFromMemory(projectId, bucket, objectKey, contentType, i))
                                                  .map(res -> res != null && !res.isEmpty())
                                                  .orElse(false);
             context.setProperty("putObjectResult", uploadResult.booleanValue());

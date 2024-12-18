@@ -44,7 +44,7 @@
         "displayName": "Content Type",
         "inputType": "stringOrExpression",
         "required": "false",
-        "helpTip": "The content type of the object.",
+        "helpTip": "The content type of the object. It overwrites the object Content Type metadata",
         "validation": "nameWithoutSpecialCharactors"
       }
     },
