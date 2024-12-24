@@ -71,11 +71,17 @@ public class GetObject extends MinioAgent {
 
             contentType = Optional.ofNullable(contentType)
                                   .orElse(blob.getContentType());
+            log.info("Blob size {}", blob.getSize()
+                                         .longValue());
             try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
                 blob.downloadTo(outputStream);
-
-                try (InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray())) {
-                    buildSynapseMessage(inputStream, contentPropertyName, "contentType", context, contentType);
+                byte[] content = outputStream.toByteArray();
+                log.info("Content length {}", content.length);
+                try (InputStream inputStream = new ByteArrayInputStream(content)) {
+                    buildSynapseMessage(inputStream, contentPropertyName, context, contentType);
+                    context.setProperty("contentType", contentType);
+                    context.setProperty("contentLength", blob.getSize()
+                                                             .longValue());
                 }
             }
 
@@ -93,7 +99,6 @@ public class GetObject extends MinioAgent {
      */
     private void buildSynapseMessage(InputStream inputStream,
                                      String contentPropertyName,
-                                     String contentTypePropertyName,
                                      MessageContext msgCtx,
                                      String contentType) throws Exception {
 
@@ -103,8 +108,7 @@ public class GetObject extends MinioAgent {
             Builder builder = selectSynapseMessageBuilder(msgCtx, contentType);
             OMElement documentElement = builder.processDocument(inputStream, contentType, axis2MsgCtx);
             //We need this to build the complete message before closing the stream
-            documentElement.toString();
-            msgCtx.setProperty(contentTypePropertyName, contentType);
+//            documentElement.toString();
             if (org.apache.commons.lang.StringUtils.isNotEmpty(contentPropertyName)) {
                 msgCtx.setProperty(contentPropertyName, documentElement);
             } else {
@@ -136,6 +140,7 @@ public class GetObject extends MinioAgent {
                 builder = new BinaryRelayBuilder();
             }
         }
+        log.info("Message builder {}", builder != null ? builder.getClass() : "No Builder");
         return builder;
     }
 }
