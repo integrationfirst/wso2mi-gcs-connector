@@ -10,5 +10,5 @@ import lombok.Setter;
 public class ObjectInfo {
     private String key;
     private String md5;
-    private int sizeInBytes;
+    private long sizeInBytes;
 }

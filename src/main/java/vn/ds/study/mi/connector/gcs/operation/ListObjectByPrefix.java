@@ -12,33 +12,26 @@
  */
 package vn.ds.study.mi.connector.gcs.operation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.axiom.om.OMElement;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.wso2.carbon.connector.core.ConnectException;
 import vn.ds.study.mi.connector.gcs.MinioAgent;
-import vn.ds.study.mi.connector.gcs.model.ListObjectResult;
 import vn.ds.study.mi.connector.gcs.model.ObjectInfo;
-import vn.ds.study.mi.connector.gcs.utils.OMElementUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 public class ListObjectByPrefix extends MinioAgent {
 
-    public static final String OBJECTS_KEY = "objs";
-    private static final String OBJECT_KEY = "obj";
-
     @Override
     protected void execute(final MessageContext messageContext) throws ConnectException {
-
-        Axis2MessageContext context = (Axis2MessageContext) messageContext;
 
         final String projectId = getParameterAsString("projectId");
         final String bucket = getParameterAsString("bucket");
@@ -52,22 +45,11 @@ public class ListObjectByPrefix extends MinioAgent {
             }
             log.info("Get object {} from GCS", objectKeyPrefix);
 
-            List<ObjectInfo> objs = listObjectByKeyPrefix(projectId, bucket, objectKeyPrefix);
-            OMElement objsElement = OMElementUtils.createOMElement(OBJECTS_KEY, null);
-            objs.forEach(obj->{
-                OMElement objElement = OMElementUtils.createOMElement(OBJECT_KEY, null);
-                OMElement keyElement = OMElementUtils.createOMElement("key", obj.getKey());
-                OMElement md5Element = OMElementUtils.createOMElement("md5", obj.getMd5());
-                objElement.addChild(keyElement);
-                objElement.addChild(md5Element);
-                objsElement.addChild(objElement);
-            });
-            final ListObjectResult result = ListObjectResult.builder()
-                                                            .operation("listObjectByPrefix")
-                                                            .isSuccessful(true)
-                                                            .resultEle(objsElement)
-                                                            .build();
-            OMElementUtils.setResultAsPayload(messageContext, result);
+            final ObjectMapper mapper = new ObjectMapper();
+            Optional.of(listObjectByKeyPrefix(projectId, bucket, objectKeyPrefix))
+                    .map(mapper::valueToTree)
+                    .map(n -> n.toString())
+                    .ifPresent(objs -> messageContext.setProperty("gcsObjects", objs));
             log.info("Complete getting object {} from GCS", objectKeyPrefix);
         } catch (Exception e) {
             log.error("Failed to download object {} from GCS", objectKeyPrefix, e);
@@ -89,6 +71,8 @@ public class ListObjectByPrefix extends MinioAgent {
             res.add(ObjectInfo.builder()
                               .key(blob.getName())
                               .md5(blob.getMd5())
+                              .sizeInBytes(blob.getSize()
+                                               .longValue())
                               .build());
             log.info("Object with key {}", blob.getName());
         }

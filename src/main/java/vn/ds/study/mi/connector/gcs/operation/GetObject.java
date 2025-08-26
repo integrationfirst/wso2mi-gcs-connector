@@ -22,14 +22,16 @@ import org.apache.axis2.builder.Builder;
 import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.transport.passthru.util.BinaryRelayBuilder;
 import org.wso2.carbon.connector.core.ConnectException;
 import vn.ds.study.mi.connector.gcs.MinioAgent;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -50,13 +52,10 @@ public class GetObject extends MinioAgent {
     @Override
     protected void execute(final MessageContext messageContext) throws ConnectException {
 
-        Axis2MessageContext context = (Axis2MessageContext) messageContext;
-
         final String projectId = getParameterAsString("projectId");
         final String bucket = getParameterAsString("bucket");
         final String objectKey = getParameterAsString("objectKey");
         String contentType = getParameterAsString("contentType");
-        final String contentPropertyName = getParameterAsString("contentPropertyName");
 
         try {
             final String googleApplicationCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
@@ -69,21 +68,26 @@ public class GetObject extends MinioAgent {
 
             Blob blob = downloadObjectIntoMemory(projectId, bucket, objectKey);
 
-            contentType = Optional.ofNullable(contentType)
-                                  .orElse(blob.getContentType());
-            log.info("Blob size {}", blob.getSize()
-                                         .longValue());
+            contentType = Optional.ofNullable(blob.getContentType())
+                                  .orElse(contentType);
+            final Map<String, Object> object = new HashMap<>();
+            String contentString = null;
             try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
                 blob.downloadTo(outputStream);
                 byte[] content = outputStream.toByteArray();
-                log.info("Content length {}", content.length);
-                try (InputStream inputStream = new ByteArrayInputStream(content)) {
-                    buildSynapseMessage(inputStream, contentPropertyName, context, contentType);
-                    context.setProperty("contentType", contentType);
-                    context.setProperty("contentLength", blob.getSize()
-                                                             .longValue());
+                if (contentType.contains("octet-stream")
+                        || contentType.contains("image")
+                        || contentType.contains("pdf")) {
+                    contentString = Base64.getEncoder()
+                                          .encodeToString(content);
+                } else {
+                    contentString = new String(content, StandardCharsets.UTF_8);
                 }
             }
+            messageContext.setProperty("gcsObjectContentType", contentType);
+            messageContext.setProperty("gcsObjectSize", blob.getSize()
+                                                            .longValue());
+            messageContext.setProperty("gcsObjectContent", contentString);
 
             log.info("Complete getting object {} from GCS", objectKey);
         } catch (Exception e) {
